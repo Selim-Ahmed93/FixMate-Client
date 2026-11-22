@@ -52,7 +52,7 @@ export function SiteHeader() {
   const [signingOut, setSigningOut] = React.useState(false);
 
   const dashboardHref = user ? dashboardPrefix[user.role] : "/login";
-  const profileHref = user ? `${dashboardPrefix[user.role]}/profile` : "/login";
+  const profileHref = user ? "/dashboard/profile" : "/login";
 
   async function handleSignOut() {
     setSigningOut(true);
