@@ -47,8 +47,26 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   React.useEffect(() => {
-    void refresh();
-  }, [refresh]);
+    let active = true;
+
+    api.auth
+      .getSession()
+      .then((session) => {
+        if (!active) return;
+        const normalized = normalizeSession(session);
+        setUser(normalized?.user ?? null);
+        setStatus(normalized ? "authenticated" : "unauthenticated");
+      })
+      .catch(() => {
+        if (!active) return;
+        setUser(null);
+        setStatus("unauthenticated");
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const signIn = React.useCallback(
     async (email: string, password: string) => {
