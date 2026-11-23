@@ -15,7 +15,9 @@ import {
   BookingStatusBadge,
   PaymentStatusBadge,
 } from "@/components/dashboard/booking-status-badge";
+import { isBookingPayable } from "@/lib/booking";
 import { CancelBookingDialog } from "./cancel-booking-dialog";
+import { PayNowButton } from "./pay-now-button";
 
 export function CustomerBookingCard({
   booking,
@@ -25,6 +27,7 @@ export function CustomerBookingCard({
   onCancelled: () => void | Promise<void>;
 }) {
   const isCompleted = booking.status === "completed";
+  const isPayable = isBookingPayable(booking);
   const displayedAmount = isCompleted
     ? (booking.finalAmount ?? booking.basePrice)
     : booking.basePrice;
@@ -113,11 +116,22 @@ export function CustomerBookingCard({
                 Final amount is being finalized.
               </p>
             ) : null}
+            {isPayable ? (
+              <p className="mt-2 text-[11px] font-semibold text-amber-700">
+                Completed · payment due
+              </p>
+            ) : null}
           </div>
 
           <div className="flex flex-wrap gap-2 lg:flex-col">
+            {isPayable ? (
+              <PayNowButton
+                bookingId={booking._id}
+                className="w-full min-w-40"
+              />
+            ) : null}
             <Button
-              variant="outline"
+              variant={isPayable ? "outline" : "default"}
               size="sm"
               render={
                 <Link href={`/dashboard/customer/bookings/${booking._id}`} />

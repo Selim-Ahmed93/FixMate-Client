@@ -6,7 +6,9 @@ import {
   ArrowLeft,
   CalendarClock,
   CalendarDays,
+  CheckCircle2,
   ClipboardList,
+  CreditCard,
   Mail,
   MapPin,
   Phone,
@@ -26,11 +28,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/shared/error-state";
 import { ServiceImage } from "@/components/services/service-image";
 import { CancelBookingDialog } from "@/components/bookings/cancel-booking-dialog";
+import { PayNowButton } from "@/components/bookings/pay-now-button";
 import {
   BookingStatusBadge,
   PaymentStatusBadge,
 } from "@/components/dashboard/booking-status-badge";
 import { api, getErrorMessage } from "@/lib/api";
+import { bookingPayableAmount, isBookingPayable } from "@/lib/booking";
 import {
   formatCurrency,
   formatDate,
@@ -132,8 +136,9 @@ export function CustomerBookingDetail({ bookingId }: { bookingId: string }) {
   }
 
   const isCompleted = booking.status === "completed";
+  const isPayable = isBookingPayable(booking);
   const displayAmount = isCompleted
-    ? (booking.finalAmount ?? booking.basePrice)
+    ? bookingPayableAmount(booking)
     : booking.basePrice;
 
   return (
@@ -285,11 +290,36 @@ export function CustomerBookingDetail({ bookingId }: { bookingId: string }) {
                 </div>
               </div>
 
-              {isCompleted && booking.paymentStatus === "unpaid" ? (
-                <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-900">
-                  This completed booking is awaiting payment. Your payment
-                  status will update here after the backend verifies checkout.
+              {isPayable ? (
+                <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50/70 p-4">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-amber-900">
+                    <CreditCard className="size-4" aria-hidden="true" />
+                    Payment due
+                  </p>
+                  <p className="mt-1.5 text-xs leading-5 text-amber-900/80">
+                    This booking is completed and unpaid. Pay{" "}
+                    <strong>{formatCurrency(displayAmount)}</strong> securely
+                    through Stripe Checkout. Your payment status updates after
+                    the backend verifies the payment.
+                  </p>
+                  <PayNowButton bookingId={booking._id} className="mt-3" />
                 </div>
+              ) : null}
+
+              {isCompleted && booking.paymentStatus === "paid" ? (
+                <p className="mt-5 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-xs font-medium text-emerald-900">
+                  <CheckCircle2 className="size-4" aria-hidden="true" />
+                  Payment received for this booking.
+                </p>
+              ) : null}
+
+              {!isCompleted &&
+              booking.status !== "cancelled" &&
+              booking.status !== "rejected" ? (
+                <p className="mt-5 rounded-lg border bg-muted/40 p-3 text-xs leading-5 text-muted-foreground">
+                  Payment becomes available once the technician completes the
+                  job and the final amount is recorded.
+                </p>
               ) : null}
 
               {booking.status === "requested" ? (
