@@ -39,6 +39,7 @@ import {
   formatCurrency,
   formatDate,
   formatDateTime,
+  objectIdDate,
 } from "@/lib/format";
 import type { Booking } from "@/lib/types";
 
@@ -240,6 +241,7 @@ export function TechnicianBookingDetail({ bookingId }: { bookingId: string }) {
   }
 
   const isCompleted = booking.status === "completed";
+  const requestedOn = booking.createdAt ?? objectIdDate(booking._id);
   const finalAmount = booking.finalAmount ?? booking.basePrice;
   const finalAmountLabel = isCompleted
     ? formatCurrency(finalAmount)
@@ -327,7 +329,7 @@ export function TechnicianBookingDetail({ bookingId }: { bookingId: string }) {
                   {formatDateTime(booking.preferredDate)}
                 </DetailItem>
                 <DetailItem icon={CalendarDays} label="Requested on">
-                  {formatDateTime(booking.createdAt)}
+                  {formatDateTime(requestedOn)}
                 </DetailItem>
                 <DetailItem icon={ClipboardList} label="Booking status">
                   <BookingStatusBadge status={booking.status} />
@@ -460,7 +462,7 @@ export function TechnicianBookingDetail({ bookingId }: { bookingId: string }) {
               Only valid transitions are available for the current status. This
               page reloads the latest booking after each update.
             </p>
-            <p className="mt-2">Requested {formatDate(booking.createdAt)}</p>
+            <p className="mt-2">Requested {formatDate(requestedOn)}</p>
           </div>
         </div>
       </div>

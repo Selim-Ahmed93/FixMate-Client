@@ -8,7 +8,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatCurrency, formatDateTime } from "@/lib/format";
+import { formatCurrency, formatDateTime, objectIdDate } from "@/lib/format";
 import type { Booking } from "@/lib/types";
 import { ServiceImage } from "@/components/services/service-image";
 import {
@@ -28,6 +28,7 @@ export function CustomerBookingCard({
 }) {
   const isCompleted = booking.status === "completed";
   const isPayable = isBookingPayable(booking);
+  const bookedOn = booking.createdAt ?? objectIdDate(booking._id);
   const displayedAmount = isCompleted
     ? (booking.finalAmount ?? booking.basePrice)
     : booking.basePrice;
@@ -92,9 +93,7 @@ export function CustomerBookingCard({
             <div className="flex min-w-0 items-center gap-2">
               <ReceiptText className="size-3.5 shrink-0" aria-hidden="true" />
               <dt className="sr-only">Booked on</dt>
-              <dd className="truncate">
-                Booked {formatDateTime(booking.createdAt)}
-              </dd>
+              <dd className="truncate">Booked {formatDateTime(bookedOn)}</dd>
             </div>
           </dl>
 

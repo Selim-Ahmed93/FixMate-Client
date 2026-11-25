@@ -39,6 +39,7 @@ import {
   formatCurrency,
   formatDate,
   formatDateTime,
+  objectIdDate,
 } from "@/lib/format";
 import type { Booking } from "@/lib/types";
 
@@ -137,6 +138,7 @@ export function CustomerBookingDetail({ bookingId }: { bookingId: string }) {
 
   const isCompleted = booking.status === "completed";
   const isPayable = isBookingPayable(booking);
+  const requestedOn = booking.createdAt ?? objectIdDate(booking._id);
   const displayAmount = isCompleted
     ? bookingPayableAmount(booking)
     : booking.basePrice;
@@ -217,7 +219,7 @@ export function CustomerBookingDetail({ bookingId }: { bookingId: string }) {
                   {booking.customerPhone || "Not provided"}
                 </DetailItem>
                 <DetailItem icon={CalendarDays} label="Requested on">
-                  {formatDateTime(booking.createdAt)}
+                  {formatDateTime(requestedOn)}
                 </DetailItem>
                 <DetailItem icon={Mail} label="Account email">
                   {booking.customerEmail}
@@ -348,7 +350,7 @@ export function CustomerBookingDetail({ bookingId }: { bookingId: string }) {
               This page reflects the latest booking status returned by FixMate.
               Refreshing after an update shows the current state.
             </p>
-            <p className="mt-2">Requested {formatDate(booking.createdAt)}</p>
+            <p className="mt-2">Requested {formatDate(requestedOn)}</p>
           </div>
         </div>
       </div>

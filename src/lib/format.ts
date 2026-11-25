@@ -39,6 +39,18 @@ export function formatDateTime(value?: string | null): string {
   return dateTimeFormatter.format(date);
 }
 
+/**
+ * MongoDB ObjectIds embed their creation time in the first four bytes.
+ * Bookings do not store a createdAt field, so this recovers the request time
+ * from the booking reference returned by the backend.
+ */
+export function objectIdDate(value?: string | null): string | null {
+  if (!value || !/^[a-f\d]{24}$/i.test(value)) return null;
+  const seconds = Number.parseInt(value.slice(0, 8), 16);
+  if (!Number.isFinite(seconds)) return null;
+  return new Date(seconds * 1000).toISOString();
+}
+
 export function toDateTimeLocal(value?: string | Date): string {
   const date = value ? new Date(value) : new Date();
   if (Number.isNaN(date.getTime())) return "";
