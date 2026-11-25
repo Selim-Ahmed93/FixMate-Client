@@ -1,6 +1,14 @@
-export const API_URL = (
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000"
-).replace(/\/$/, "");
+// Absolute origin of the FixMate API. Browser requests go to the same origin
+// and are proxied by the `/api/:path*` rewrite in `next.config.ts`, so Better
+// Auth session cookies stay first-party. Server-side requests (for example
+// `generateMetadata`) need this absolute origin because fetch requires it.
+const DEFAULT_API_ORIGIN = "http://localhost:5000";
+
+export const API_ORIGIN = (
+  process.env.API_PROXY_TARGET ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  DEFAULT_API_ORIGIN
+).replace(/\/+$/, "");
 
 export const siteConfig = {
   name: "FixMate",

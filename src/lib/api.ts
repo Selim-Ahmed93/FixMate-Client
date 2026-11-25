@@ -1,4 +1,4 @@
-import { API_URL } from "./config";
+import { API_ORIGIN } from "./config";
 import type {
   AdminStats,
   ApiMessage,
@@ -36,7 +36,12 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   let response: Response;
 
   try {
-    response = await fetch(`${API_URL}${path}`, {
+    // Browsers call the same origin so the `/api/:path*` rewrite can proxy the
+    // request and keep auth session cookies first-party. Server-side callers,
+    // such as `generateMetadata`, still need the absolute API origin.
+    const baseUrl = typeof window === "undefined" ? API_ORIGIN : "";
+
+    response = await fetch(`${baseUrl}${path}`, {
       ...init,
       credentials: "include",
       cache: "no-store",
